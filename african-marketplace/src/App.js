@@ -39,7 +39,6 @@ const initialLoginErrors = {
 const initialItems = []
 const initialDisabled = true
 
-
 export default function App() {
   //////////////// STATES ////////////////
   const [items, setItems] = useState(initialFriends)          
@@ -96,15 +95,15 @@ export default function App() {
   const validateLogin = (name, value) => {
     reach(loginSchema, name)
       .validate(value)
-      .then(() => setFormErrors({ ...formErrors, [name]: '' }))
-      .catch(err => setFormErrors({ ...formErrors, [name]: err.errors[0]}))
+      .then(() => setLoginErrors({ ...loginErrors, [name]: '' }))
+      .catch(err => setLoginErrors({ ...loginErrors, [name]: err.errors[0]}))
   }
   //////////////// EVENT HANDLERS ////////////////
   const inputChange = (name, value) => {
    validate(name, value)
     setFormValues({
       ...formValues,
-      [name]: value // NOT AN ARRAY
+      [name]: value 
     })
   }
 
@@ -126,7 +125,7 @@ export default function App() {
       pw: loginValues.pw
     }
     
-    postItem(newItem)
+    postLogin(loginData)
   }
 
   //////////////// SIDE EFFECTS ////////////////
