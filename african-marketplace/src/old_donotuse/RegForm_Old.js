@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function LoginForm(props) {
+export default function RegForm(props) {
     const {
         values,
         submit,
@@ -22,13 +22,14 @@ export default function LoginForm(props) {
       return (
         <form className='form container' onSubmit={onSubmit}>
           <div className='form-group submit'>
-            <h2>Log in to Dashboard</h2>
+            <h2>Create an Account</h2>
     
-            <button disabled={disabled}>Log In</button>
+            <button disabled={disabled}>Register</button>
     
             <div className='errors'>
               <div>{errors.email}</div>
               <div>{errors.password}</div>
+              <div>{errors.location}</div>
             </div>
           </div>
     
@@ -41,7 +42,6 @@ export default function LoginForm(props) {
                 type='email'
               />
             </label>
-
             <label>Password
               <input
                 value={values.pw}
@@ -49,6 +49,20 @@ export default function LoginForm(props) {
                 name='pw'
                 type='text'
               />
+            </label>
+
+            <label>Market Location
+              <select
+                onChange={onChange}
+                value={values.location}
+                name='location'
+              >
+                <option value=''>- Select an option -</option>
+                <option value='kya'>Kenya</option>
+                <option value='tza'>Tanzania</option>
+                <option value='rwa'>Rwanda</option>
+                <option value='uga'>Uganda</option>
+              </select>
             </label>
          </div>
         </form>

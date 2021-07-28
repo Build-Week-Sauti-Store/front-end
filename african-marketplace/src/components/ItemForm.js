@@ -1,45 +1,97 @@
-import React from 'react'
+import React, { useState,useEffect } from 'react'
+import axios from 'axios'
+import { reach } from 'yup'
+import formSchema from './components/FormSchema'
 
-export default function ItemForm(props) {
-    const {
-        values,
-        submit,
-        change,
-        disabled,
-        errors,
-      } = props
+const initialFormValues = {
+    name: '',
+    description: '',
+    price:'',
+    location: '',
+    category: '',
+}
+  
+const initialFormErrors = {
+    name: '',
+    description: '',
+    price:'',
+    location: '',
+    category: '',
+}
+
+const initialItems = []
+const initialDisabled = true
+  
+export default function ItemForm() {
+    const [items, setItems] = useState(initialItems)          
+    const [formValues, setFormValues] = useState(initialFormValues) 
+    const [formErrors, setFormErrors] = useState(initialFormErrors) 
+    const [disabled, setDisabled] = useState(initialDisabled)   
+
+    const validate = (name, value) => {
+        reach(formSchema, name)
+            .validate(value)
+            .then(() => setFormErrors({ ...formErrors, [name]: '' }))
+            .catch(err => setFormErrors({ ...formErrors, [name]: err.errors[0]}))
+    }
+
+    const inputChange = event => {
+        const name = event.target
+        const value = event.target.value
+        validate(name, value)
+         setFormValues({
+           ...formValues,
+           [name]: value 
+         })
+    }
     
-      const onSubmit = evt => {
-        evt.preventDefault()
-        submit()
+    const formSubmit = event => {
+        event.preventDefault()
+        const newItem = {
+          name: formValues.name.trim(),
+          description: formValues.description.trim(),
+          price: formValues.price.trim(),
+          location: formValues.location,
+          category: formValues.category,
+        }
+        
+        axios.post('https://african-marketplace-bw4.herokuapp.com/stillneedthis', newItem) //still need the link for this?
+          .then(res => {
+            setItems([res.data, ...items])
+          })
+          .catch(err => {
+            console.log(err)
+          })
+          .finally(() => {
+            setFormValues(initialFormValues)
+          })
       }
+
+    useEffect(() => {
+        formSchema.isValid(formValues).then(valid => setDisabled(!valid))
+    }, [formValues])
     
-      const onChange = evt => {
-        const { name, value } = evt.target
-        change(name, value)
-      }
-    
-      return (
-        <form className='form container' onSubmit={onSubmit}>
+    return (
+        <form className='form container' onSubmit={formSubmit}>
           <div className='form-group submit'>
             <h2>Add an Item</h2>
     
             <button disabled={disabled}>Submit</button>
     
             <div className='errors'>
-              <div>{errors.name}</div>
-              <div>{errors.category}</div>
-              <div>{errors.location}</div>
-              <div>{errors.price}</div>
-              <div>{errors.description}</div>
+              <div>{formErrors.name}</div>
+              <div>{formErrors.category}</div>
+              <div>{formErrors.location}</div>
+              <div>{formErrors.price}</div>
+              <div>{formErrors.description}</div>
             </div>
           </div>
     
           <div className='form-group inputs'>
           <label>Market Location
               <select
-                onChange={onChange}
-                value={values.location}
+                onChange={inputChange}
+                value={formValues.location}
                 name='location'
               >
                 <option value=''>- Select an option -</option>
@@ -52,8 +104,8 @@ export default function ItemForm(props) {
             
             <label>Item Name
               <input
-                value={values.name}
-                onChange={onChange}
+                value={formValues.name}
+                onChange={inputChange}
                 name='name'
                 type='text'
               />
@@ -61,8 +113,8 @@ export default function ItemForm(props) {
 
             <label>Item Category
               <select
-                onChange={onChange}
-                value={values.category}
+                onChange={inputChange}
+                value={formValues.category}
                 name='category'
               >
                 <option value=''>- Select an option -</option>
@@ -76,8 +128,8 @@ export default function ItemForm(props) {
 
             <label>Item Price
               <input
-                value={values.price}
-                onChange={onChange}
+                value={formValues.price}
+                onChange={inputChange}
                 name='price'
                 type='text'
               />
@@ -85,13 +137,13 @@ export default function ItemForm(props) {
 
             <label>Item Description
               <input
-                value={values.description}
-                onChange={onChange}
+                value={formValues.description}
+                onChange={inputChange}
                 name='description'
                 type='text'
               />
             </label>
           </div>
         </form>
-      )
+    )
 }
